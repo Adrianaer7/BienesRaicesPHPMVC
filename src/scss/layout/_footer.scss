@@ -1,0 +1,21 @@
+.footer {   //footer
+    padding: calc($separacion/2) 0;  //2.5rem arriba y abajo - 0 a los lados
+    background-color: $grisOscuro;
+    margin-bottom: 0;
+
+    .contenido-footer { //div
+        padding-top: calc($separacion / 2) ;
+    }
+    
+    .navegacion {
+        visibility: visible;
+        opacity: 1;
+        height: auto;   //reseteo la altura de la nav en el footer ya que en el global la altura por default es 0
+    }
+
+    .copyright {    //p
+        color: $blanco;
+        text-align: center;
+    }
+
+}

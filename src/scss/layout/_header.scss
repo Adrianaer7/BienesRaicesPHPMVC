@@ -1,0 +1,42 @@
+.webp .inicio { //.webp clase agregada por modernizr en el <html> para identificar si el navegador soporta webp, sino agrega no-webp
+    background-image: url(../../../build/img/header.webp);
+}
+.no-webp .inicio {
+    background-image: url(../../../build/img/header.jpg);
+}
+
+.header {   //header - General
+    background-color: $grisOscuro;
+    padding: 1rem 0 3rem 0;
+
+    &.inicio {  //header - Solo pagina inicio
+        background-position: center center;
+        background-repeat: no-repeat;
+        background-size: cover;
+        
+        @include tablet {   //el minimo que ocupa el header es 70rem
+            min-height: 70rem;
+        }
+
+        .contenido-header { //div - le doy ancho minimo para que se separe la barra del h1
+            @include tablet {
+                min-height: 70rem;
+            }
+        }
+    }
+
+}
+
+.contenido-header { //div
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    
+    h1 {
+        text-align: left;
+        color: $blanco;
+        font-weight: $bold;
+        line-height: 2;
+        max-width: 60rem;
+    }
+}

@@ -1,0 +1,87 @@
+.derecha {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    @include tablet {
+        align-items: flex-end;
+    }
+    .dark-mode-boton {
+        width: 3rem;
+        margin: 3rem 0 2rem 0;
+        filter: invert(100%);
+
+        @include tablet {
+            margin-top: 0;
+        }
+        &:hover {
+            cursor: pointer;
+        }
+    }
+}
+
+.barra {    //div
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 3rem;
+
+    //si no le pongo esto, firefox no muestra imagen de logo
+    a {
+        img {
+            max-width: 100%;
+            width: 28rem;
+            height: auto;
+        }
+    }
+    
+    @include tablet {
+        flex-direction: row;
+        align-items: flex-end;
+        justify-content: space-between;
+
+    }
+}
+
+.navegacion {   //nav
+    visibility: hidden;  //se oculta por default
+    opacity: 0;
+    transition: visibility .3s ease-in-out, opacity 0.5s linear, height .5s linear;    //transicion para mostrar el nav u ocultarlo
+    height: 0;  //no tiene altura a menos que haga click en el menu hamburguesa
+
+    @include tablet {
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+        opacity: 1; //muestro el nav
+        visibility: visible;
+    }
+    a {
+        color: $blanco;
+        text-decoration: none;
+        font-size: 2.2rem;
+        display: block;
+        text-align: center;
+
+        @include tablet {
+            font-size: 1.8rem;
+        }
+        
+    }
+}
+
+//Menu hamburguesa
+.mobile-menu {
+    @include tablet {
+        display: none; // se muestra por default, se oculta en pantalla grande
+    }
+    img {
+        width: 5rem;
+    }
+}
+
+.mostrar {  //esta clase aparece y desaparece en la nav al hacer click y hace que se muestre el nav
+    visibility: visible;
+    opacity: 1;
+    height: auto;   //le doy altura al nav
+}

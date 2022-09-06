@@ -1,0 +1,72 @@
+@include tablet {
+    .contenedor-anuncios {  //div
+        @include grid(2, 2rem)
+    }
+}
+@include desktop {
+    .contenedor-anuncios {  //div
+        @include grid(3, 2rem)
+    }
+}
+
+.anuncio {  //div
+    background-color: lighten($gris, 5);
+    border: 1px solid darken($gris, 10);
+    margin-bottom: 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    &:last-of-type {
+        margin-bottom: 0;
+    }
+    @include tablet {
+        margin-bottom: 0;
+    }
+
+    .contenido-anuncio {    //div
+        padding: 2rem;
+
+    }
+    .titulo-descripcion {
+        padding: 0 2rem 0 2rem;
+    }
+
+    h3, p {
+        margin: 0;
+        word-break: break-all;
+    }
+}
+
+.precio {   //p
+    color: $verde;
+    font-weight: 700;
+    font-size: 3rem;
+}
+
+.iconos-caracteristicas {   //ul
+    display: flex;
+    list-style: none;
+    padding: 0;
+    max-width: 40rem;
+    
+    li {
+        display: flex;
+        flex: 1;    //con flex 1 este elemento toma todo el resto del ancho del img, que tiene flex 0
+    }
+    img {
+        flex: 0 0 5rem; //0 0 es para que no crezca ni decrezca. El 5rem le da un tamaño fijo
+        margin-right: 1rem; 
+    }
+    p {
+        font-weight: $black;
+    }
+
+}
+
+.resumen-propiedad {
+    padding: 0 2rem 0 2rem;
+    
+    p {
+        word-break: break-all;
+    }
+}
