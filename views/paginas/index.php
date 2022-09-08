@@ -21,7 +21,7 @@
 
     <section class="contenedor seccion">
         <h2>Casas y Departamentos en venta</h2>
-        <?php include "includes/templates/anuncios.php"; ?>
+        <?php include "listado.php"; ?>
 
         <div class="alinear-derecha">
             <a href="anuncios.php"  class="boton-verde">Ver todas</a>
