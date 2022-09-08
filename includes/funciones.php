@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 define("TEMPLATES_URL", __DIR__ . "/templates");    //__DIR__ es una funcion de php que trae toda la ruta anterior a templates. A la ruta le agrego el nombre TEMPLATES_URL para que sea mas facil importarla
 define("FUNCIONES_URL", __DIR__ . "/funciones.php");
-define("CARPETA_IMAGENES", __DIR__ . "../../imagenes/");
+define("CARPETA_IMAGENES", $_SERVER["DOCUMENT_ROOT"] . "/imagenes/");  //document root es la ruta donde esta almacenado la raiz del servidor, osea bienesraicesmvc/public
 
 function incluirTemplate(string $nombre, string $pagina = "Bienes Raices", bool $inicio = false ) {    //importo de cada pagina el nombre de lo que quiero importar. Lo uso para importar header y footer. Si inicio me llega como true, agrego la clase inicio al header
     include TEMPLATES_URL . "/{$nombre}.php";
@@ -55,4 +55,14 @@ function mostrarNotificacion($codigo) {
             break;
     }
     return $mensaje;
+}
+
+function validarOredireccionar(string $url) {
+    //Validar que el id por URL que recibo sea numero entero
+    $id = $_GET["id"];
+    $id = filter_var($id, FILTER_VALIDATE_INT);
+    if(!$id) {
+        header("Location: ${url}");
+    }
+    return $id;
 }

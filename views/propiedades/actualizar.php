@@ -1,5 +1,5 @@
 <main class="contenedor seccion">
-        <h1>Crear propiedad</h1>
+        <h1>Actualizar propiedad</h1>
         <a href="/admin" class="boton boton-verde">Volver</a>
         <?php foreach($errores as $error) { ?>
             <div class="alerta error">
@@ -15,7 +15,7 @@
             <input 
                 type="submit" 
                 class="boton boton-verde"
-                value="Crear propiedad" 
+                value="Guardar cambios" 
             >
         </form>
 </main>
