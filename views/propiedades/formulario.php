@@ -7,7 +7,7 @@
         name="propiedad[titulo]"
         id="titulo" 
         placeholder="Titulo Propiedad" 
-        value="<?php echo s($propiedad->titulo); ?>"
+        value="<?php echo s($propiedad->titulo); ?>" 
     >
 
     <label for="precio">Precio:</label>

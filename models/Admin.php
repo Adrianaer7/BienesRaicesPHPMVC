@@ -4,39 +4,76 @@
     class Admin extends ActiveRecord {
         //Base e datos
         protected static $tabla = "usuarios";
-        protected static $columnasDB = ["id", "email", "password"];
+        protected static $columnasDB = ["id", "email", "password", "confirmarPassword", "confirmado", "token"];
 
         public $id;
+        public $nombre;
         public $email;
         public $password;
+        public $confirmarPassword;
+        public $confirmado;
+        public $token;
+
 
         public function __construct($args = [])
         {
             $this->id = $args["id"] ?? null;
+            $this->nombre = $args['nombre'] ?? '';
             $this->email = $args["email"] ?? "";
             $this->password = $args["password"] ?? "";
+            $this->confirmarPassword = $args['confirmar'] ?? '';
+            $this->confirmado = $args['confirmado'] ?? 0;
+            $this->token = $args['token'] ?? '';
+
+
         }
 
         //validar campos
-        public function validar() {
+        public function validarLogin() {
             if(!$this->email) {
                 self::$errores[] = "El email es obligatorio";
             }
             if(!$this->password) {
-                self::$errores[] = "La contraseña es obligatorio";
+                self::$errores[] = "La contraseña es obligatoria";
+            }
+            return self::$errores;
+        }
+
+        public function validarRegistro() {
+            if(!$this->nombre) {
+                self::$errores[] = "El nombre es obligatorio";
+            }
+            if(!$this->email) {
+                self::$errores[] = "El email es obligatorio";
+            }
+            if(!$this->password) {
+                self::$errores[] = "La contraseña es obligatoria";
+            }
+            if(!$this->confirmarPassword) {
+                self::$errores[] = "Repite la contraseña";
+            }
+            if($this->password !== $this->confirmarPassword) {
+                self::$errores[] = "Las contraseñas deben ser iguales";
             }
             return self::$errores;
         }
 
         //revisar si el usuario existe
-        public function existeUsuario() {
+        public function existeUsuario($accion) {
             $query = "SELECT * FROM " . self::$tabla . " WHERE email = '$this->email'" . " LIMIT 1";
             $resultado = self::$db->query($query); 
-            if(!$resultado->num_rows) {
-                self::$errores[] = "El usuario no existe";
-                return;
+            if($accion === "logearse") {
+                if(!$resultado->num_rows) {
+                    self::$errores[] = "El usuario no existe";
+                    return;
+                }
+                return $resultado;
+            } else {
+                if($resultado->num_rows) {
+                    self::$errores[] = "El usuario ya existe";
+                    return $resultado;
+                }
             }
-            return $resultado;
         }
 
         //si el usuario existe, compruebo password
