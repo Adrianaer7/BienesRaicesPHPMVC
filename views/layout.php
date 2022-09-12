@@ -8,7 +8,7 @@
         $inicio = false;
     }
     if(!isset($pagina)) {
-        $pagina = "Pagina";
+        $pagina = "Admin";
     }
 ?>
 
@@ -39,7 +39,7 @@
                         <a href="/blog">Blog</a>
                         <a href="/contacto">Contacto</a>
                         <?php if($auth) { ?>
-                            <a href="/cerrar-sesion">Cerrar Sesión</a>
+                            <a href="/logout">Cerrar Sesión</a>
                         <?php } else { ?>
                             <a href="/login">Iniciar Sesión</a>
                         <?php } ?>

@@ -15,6 +15,12 @@
 
         //Comprobar rutas validas
         public function comprobarRutas() {
+            session_start();    //para poder acceder al $_SESSION
+            $auth = $_SESSION["login"] ?? false;
+
+            //Arreglo de rutas protegidas
+            $rutas_protegidas = ["/admin", "/propiedades/crear", "/propiedades/actualizar", "/propiedades/eliminar", "/vendedores/crear", "/vendedores/actualizar", "/vendedores/eliminar"];
+
             $urlActual = $_SERVER["PATH_INFO"] ?? "/";  //obtengo la ruta donde estoy parado, si estoy parado en la raiz, osea localhost:3000 entonces le agrego "/". Al array $_SERVER puedo acceder desde cualquier parte del proyecto ya que viene desde el servidor localhost:3000
             $metodo = $_SERVER["REQUEST_METHOD"];   //guardo el tipo de metodo
 
@@ -23,6 +29,11 @@
                 $fn = $this->rutasGET[$urlActual] ?? null;  //guardo la funcion que tiene la url en donde estoy parado, si no existe la url, le asigno null
             } else {
                 $fn = $this->rutasPOST[$urlActual] ?? null;  
+            }
+
+            //Proteger las rutas
+            if(in_array($urlActual, $rutas_protegidas) && !$auth) { //si la url donde estoy es igual a alguna de las rutas privadas y no inicié sesion, redirijo al home
+                header("Location: /");
             }
 
             //Si la URL existe

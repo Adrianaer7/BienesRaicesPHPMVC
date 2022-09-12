@@ -14,10 +14,19 @@
 
                 if(empty($errores)) {
                     //Verificar si el usuario existe
-
-                    //Verificar la contraseña
-
-                    //Autenticar al usuario
+                    $resultado = $auth->existeUsuario();
+                    if(!$resultado) {
+                        $errores = Admin::getErrores();
+                    } else {
+                        //Verificar la contraseña
+                        $autenticado = $auth->comprobarPassword($resultado);
+                        if(!$autenticado) {
+                            $errores = Admin::getErrores();
+                        } else {
+                            //Autenticar al usuario
+                            $auth->autenticar();
+                        }
+                    }
                 }
             }
 
@@ -27,7 +36,10 @@
             ]);
         }
         public static function logout(Router $router) {
-            echo "2";
+            session_start();
+            $_SESSION = [];
+
+            header("Location: /");
         }
     }
 ?>
