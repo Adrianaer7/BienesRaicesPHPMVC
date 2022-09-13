@@ -6,10 +6,10 @@
         protected static $db;   //protected porque solo se puede acceder a ella en la clase. Static porque no se va a crear una instancia por cada objeto nuevo, la conexion a la bd siempre es con las mismas credenciales. Esto ahorra ram
         protected static $columnasDB = [];
         protected static $tabla = "";
-
+        
         //Errores
         protected static $errores = [];
-
+        
         
         //DEFINIR CONEXION A LA BD
         public static function setDB($database) {   //recibo $dabatase del app.php que es donde se ejecuta este metodo
@@ -33,7 +33,7 @@
         public function atributos() : array {
             $atributos = [];
             foreach(static::$columnasDB as  $columna) {
-                if($columna === "id") continue; //al id no hay que sanitizarlo, por eso no lo guardo en el array atributos. El continue hace que no se ejecute lo que esté debajo, y el foreach siga con el siguiente elemento
+                if($columna === "id" || $columna === "confirmar_password") continue; //al id no hay que sanitizarlo, por eso no lo guardo en el array atributos. El continue hace que no se ejecute lo que esté debajo, y el foreach siga con el siguiente elemento
                 $atributos[$columna] = $this->$columna; //$this es la instancia del objeto en memoria, en este caso (propiedad) y $columna es el valor que contiene la columna de ese $this, seria asi: $propiedad["Casa en la playa"]. A esto se lo agrego al array atributo, el cual en cada columna ($atributos["nombre]) va recibiendo $propiedad["Casa en la playa"].
             }
             return $atributos;
@@ -49,15 +49,6 @@
             return $sanitizado;
         }
 
-        //GUARDAR LOS DATOS EN LA BD
-        public function guardar() {
-            if((!is_null($this->id))) {  //Actualizar
-                $this->actualizar();
-            } else {    //Crear nuevo
-                $this->crear();
-            }
-        }
-
         public function crear() {
             //Guardar valores sanitizados
             $atributos = $this->sanitizarAtributos();   //ejecuto la funcion de sanitizar y con this-> accedo a los valores que me retorna esa funcion, a esos valores los guardo en atributos
@@ -68,12 +59,10 @@
             $query .= join("', '", array_values($atributos));   //array_values son los valores de las columnas
             $query .= "')";
             $resultado = self::$db->query($query);  //resultado devuelve true. Con db->query accedo al metodo que forma parte de la instancia de mysqli y sirve para hacer la consulta
+            return $resultado;
             
-            if($resultado) {
-                header("Location: /admin?resultado=1");
-            }
         }
-
+        
         public function actualizar() {
             //Guardar valores sanitizados
             $atributos = $this->sanitizarAtributos();
@@ -92,11 +81,22 @@
                 header("Location: /admin?resultado=2");
             }
         }
+        
+        //GUARDAR LOS DATOS EN LA BD
+        public function guardar() {
+            if((!is_null($this->id))) {  //Actualizar
+                $this->actualizar();
+            } else {    //Crear nuevo
+                $resultado = $this->crear();
+                return $resultado;
+            }
+        }
 
         //VALIDACION
         public static function getErrores() : array {
             return static::$errores;
         }
+
 
         //Esta funcion de momento no es necesaria ya que se utiliza en la clase propiedad
         public function validar() {

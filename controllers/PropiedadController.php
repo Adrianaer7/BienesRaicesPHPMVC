@@ -52,7 +52,10 @@
                     $image->save(CARPETA_IMAGENES . $nombreImagen);
                      
                     //Guardo en la BD
-                    $propiedad->guardar();
+                    $resultado = $propiedad->guardar();
+                    if($resultado) {
+                        header("Location: /admin?resultado=1");
+                    }
                 }
             }
 

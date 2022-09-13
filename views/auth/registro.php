@@ -5,7 +5,7 @@
                 <?php echo $error ?>
             </div>
         <?php } ?>
-        <form method="POST" class="formulario" action="/registro">
+        <form method="POST" class="formulario">
             <fieldset>
                 <legend>Datos de usuario</legend>
 
@@ -24,6 +24,8 @@
                     placeholder="Tu email" 
                     id="email"
                     name="email"
+                    value="<?php echo s($usuario->email) ?>"
+
                 >
 
                 <label for="password">Contraseña</label>
@@ -32,13 +34,17 @@
                     placeholder="Tu contraseña" 
                     id="password"
                     name="password"
+                    value="<?php echo s($usuario->password) ?>"
+
                 >
-                <label for="confirmar">Contraseña</label>
+                <label for="confirmar">Repetir contraseña</label>
                 <input 
-                    type="confirmar" 
+                    type="password" 
                     placeholder="Repite tu contraseña" 
                     id="confirmar"
-                    name="confirmar"
+                    name="confirmar_password"
+                    value="<?php echo s($usuario->confirmar_password) ?>"
+
                 >
             </fieldset>   
             <input 

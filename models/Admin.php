@@ -4,13 +4,13 @@
     class Admin extends ActiveRecord {
         //Base e datos
         protected static $tabla = "usuarios";
-        protected static $columnasDB = ["id", "email", "password", "confirmarPassword", "confirmado", "token"];
+        protected static $columnasDB = ["id", "email", "password", "nombre", "confirmar_password", "confirmado", "token"];
 
         public $id;
-        public $nombre;
         public $email;
         public $password;
-        public $confirmarPassword;
+        public $nombre;
+        public $confirmar_password;
         public $confirmado;
         public $token;
 
@@ -18,20 +18,31 @@
         public function __construct($args = [])
         {
             $this->id = $args["id"] ?? null;
-            $this->nombre = $args['nombre'] ?? '';
             $this->email = $args["email"] ?? "";
             $this->password = $args["password"] ?? "";
-            $this->confirmarPassword = $args['confirmar'] ?? '';
+            $this->nombre = $args['nombre'] ?? "";
+            $this->confirmar_password = $args['confirmar'] ?? "";
             $this->confirmado = $args['confirmado'] ?? 0;
-            $this->token = $args['token'] ?? '';
+            $this->token = $args['token'] ?? "";
 
 
+        }
+
+        public function vaciarForm() {
+            $this->id =  null;
+            $this->password =  "";
+            $this->confirmar_password = "";
+            $this->confirmado =  0;
+            $this->token = "";
         }
 
         //validar campos
         public function validarLogin() {
             if(!$this->email) {
                 self::$errores[] = "El email es obligatorio";
+            }
+            if(!filter_var($this->email, FILTER_VALIDATE_EMAIL)) {
+                self::$errores[] = 'Email no válido';
             }
             if(!$this->password) {
                 self::$errores[] = "La contraseña es obligatoria";
@@ -46,13 +57,19 @@
             if(!$this->email) {
                 self::$errores[] = "El email es obligatorio";
             }
+            if(!filter_var($this->email, FILTER_VALIDATE_EMAIL)) {
+                self::$errores[] = 'Email no válido';
+            }
             if(!$this->password) {
                 self::$errores[] = "La contraseña es obligatoria";
             }
-            if(!$this->confirmarPassword) {
+            if(strlen($this->password) < 6) {
+                self::$errores[] = "La contraseña debe tener al menos 6 caracteres";
+            }
+            if(!$this->confirmar_password) {
                 self::$errores[] = "Repite la contraseña";
             }
-            if($this->password !== $this->confirmarPassword) {
+            if($this->password !== $this->confirmar_password) {
                 self::$errores[] = "Las contraseñas deben ser iguales";
             }
             return self::$errores;
@@ -74,6 +91,15 @@
                     return $resultado;
                 }
             }
+        }
+
+        public function hashPassword() : void {
+            $this->password = password_hash($this->password, PASSWORD_BCRYPT);
+
+        }
+
+        public function crearToken() : void {
+            $this->token = uniqid();
         }
 
         //si el usuario existe, compruebo password
