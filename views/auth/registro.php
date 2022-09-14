@@ -5,7 +5,7 @@
                 <?php echo $error ?>
             </div>
         <?php } ?>
-        <form method="POST" class="formulario">
+        <form method="POST" class="formulario" action="/registro">
             <fieldset>
                 <legend>Datos de usuario</legend>
 
@@ -15,6 +15,7 @@
                     placeholder="Tu nombre" 
                     id="nombre"
                     name="nombre"
+                    autocomplete="off"
                     value="<?php echo s($usuario->nombre) ?>"
 
                 >
@@ -24,6 +25,7 @@
                     placeholder="Tu email" 
                     id="email"
                     name="email"
+                    autocomplete="off"
                     value="<?php echo s($usuario->email) ?>"
 
                 >
@@ -33,6 +35,7 @@
                     type="password" 
                     placeholder="Tu contraseña" 
                     id="password"
+                    autocomplete="off"
                     name="password"
                     value="<?php echo s($usuario->password) ?>"
 
@@ -42,6 +45,7 @@
                     type="password" 
                     placeholder="Repite tu contraseña" 
                     id="confirmar"
+                    autocomplete="off"
                     name="confirmar_password"
                     value="<?php echo s($usuario->confirmar_password) ?>"
 

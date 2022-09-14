@@ -7,6 +7,9 @@
     use Controllers\VendedorController;
     use Controllers\PaginasController;
 
+    $url = $_SERVER["PATH_INFO"];
+    $url = explode('/',$url)[2];  //separo la url en arrays segun sus /, y accedo a la posicion 2
+
     //Instancio la clase
     $router = new Router();
 
@@ -41,8 +44,10 @@
     $router->get("/logout", [AuthController::class, "logout"]);
     $router->get("/registro", [AuthController::class, "registro"]);
     $router->post("/registro", [AuthController::class, "registro"]);
+    $router->get("/mensaje/${url}", [AuthController::class, "mensaje"]);    //leo la url de msj con la url que obtube arriba
+    $router->get("/confirmar-cuenta/${url}", [AuthController::class, 'confirmar']);
 
-
+     
     //Ejecutar las funciones asociadas a esas rutas
     $router->comprobarRutas();
 ?>

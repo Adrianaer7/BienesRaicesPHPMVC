@@ -4,7 +4,7 @@
     class Admin extends ActiveRecord {
         //Base e datos
         protected static $tabla = "usuarios";
-        protected static $columnasDB = ["id", "email", "password", "nombre", "confirmar_password", "confirmado", "token"];
+        protected static $columnasDB = ["id", "email", "password", "nombre", "confirmar_password", "confirmado", "token_msj", "token_confirmar"];
 
         public $id;
         public $email;
@@ -12,7 +12,8 @@
         public $nombre;
         public $confirmar_password;
         public $confirmado;
-        public $token;
+        public $token_msj;
+        public $token_confirmar;
 
 
         public function __construct($args = [])
@@ -23,18 +24,10 @@
             $this->nombre = $args['nombre'] ?? "";
             $this->confirmar_password = $args['confirmar'] ?? "";
             $this->confirmado = $args['confirmado'] ?? 0;
-            $this->token = $args['token'] ?? "";
-
-
+            $this->token_msj = $args['token_msj'] ?? "";
+            $this->token_confirmar = $args['token_confirmar'] ?? "";
         }
 
-        public function vaciarForm() {
-            $this->id =  null;
-            $this->password =  "";
-            $this->confirmar_password = "";
-            $this->confirmado =  0;
-            $this->token = "";
-        }
 
         //validar campos
         public function validarLogin() {
@@ -93,13 +86,25 @@
             }
         }
 
+        public function existeTokenUsuario($url, $token) {
+            $query = "SELECT * FROM " . self::$tabla . " WHERE $token = '$url'" . " LIMIT 1";
+            $resultado = self::consultarSQL($query);
+            if($resultado) {
+                return array_shift( $resultado ) ;
+            } else {
+                header("Location: /");
+            }
+        }
+
         public function hashPassword() : void {
             $this->password = password_hash($this->password, PASSWORD_BCRYPT);
 
         }
 
         public function crearToken() : void {
-            $this->token = uniqid();
+            $this->token_msj = md5(uniqid(rand(), true));
+            $this->token_confirmar = md5(uniqid(rand(), true));
+
         }
 
         //si el usuario existe, compruebo password

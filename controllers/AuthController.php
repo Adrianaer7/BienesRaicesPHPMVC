@@ -2,6 +2,8 @@
     namespace Controllers;
     use MVC\Router;
     use Model\Admin;
+    use Classes\Email;
+use Classes\EmailUsuario;
 
     class AuthController {
         public static function login(Router $router) {
@@ -34,12 +36,13 @@
                     }
                 }
             }
-
             $router->render("auth/login", [
                 "pagina" => $pagina,
                 "errores" => $errores
             ]);
         }
+
+
         public static function logout() {
             session_start();
             $_SESSION = [];
@@ -47,15 +50,15 @@
             header("Location: /");
         }
 
+
         public static function registro(Router $router) {
             $pagina = "Registro";
             $errores = [];
             $usuario = new Admin;
-
+            
             if($_SERVER["REQUEST_METHOD"] === "POST") {
-                
                 //Guardo el objeto en memoria para que no se vacien los campos
-                $usuario = new Admin($_POST);
+                $usuario->sincronizar($_POST);
 
                 //Si hay errores
                 $errores = $usuario->validarRegistro();
@@ -73,13 +76,17 @@
 
                         //creo un token
                         $usuario->crearToken();
-
+                        $urlMensaje = $usuario->token_msj;
+                        
                         //Guardo el usuario nuevo en la BD
                         $resultado = $usuario->guardar();
 
+                        //Envio email
+                        $email = new EmailUsuario($usuario->email, $usuario->nombre, $usuario->token_confirmar);
+                        $email->enviarConfirmacion();
+
                         if($resultado) {
-                            $errores[] = "Cuenta creada exitosamente. Por favor comprueba tu email";
-                            
+                            header("Location: /mensaje/${urlMensaje}");
                         }
                     }
                 }
@@ -91,6 +98,53 @@
             ]);
         }
 
-       
+       public static function mensaje(Router $router) {
+           $pagina = "Mensaje";
+           $token = "token_msj";
+
+           //separo la url en arrays segun sus /, y accedo a la posicion 2
+           $url = s($_SERVER["PATH_INFO"]);
+           $url = explode('/',$url)[2];
+           if(!$url) {
+              header("Location: /");
+           }
+
+           //Instancio admin para poder ejecutar sus funciones
+           $usuario = new Admin();
+
+           //verifico que algun usuario tenga ese token de msj
+            $usuario->existeTokenUsuario($url, $token);
+            
+            $router->render("auth/mensaje", [
+                "pagina" => $pagina
+            ]);
+        }
+
+        public static function confirmar(Router $router) {
+            $pagina = "Confirmacion de cuenta";
+            $token = "token_confirmar";
+
+            //separo la url en arrays segun sus /, y accedo a la posicion 2
+            $url = s($_SERVER["PATH_INFO"]);
+            $url = explode('/',$url)[2]; 
+            if(!$url) {
+                header("Location: /");
+            }
+
+            //Instancio admin para poder ejecutar sus funciones
+            $usuario = new Admin();
+
+            //verifico que algun usuario tenga ese token de msj
+            $resultado = $usuario->existeTokenUsuario($url, $token);
+            if($resultado) {
+                $usuario = new Admin($resultado);
+                debugear($usuario);
+                $usuario->guardar();
+            }
+
+            $router->render("auth/confirmar", [
+            "pagina" => $pagina
+        ]);
+        }
     }
 ?>
