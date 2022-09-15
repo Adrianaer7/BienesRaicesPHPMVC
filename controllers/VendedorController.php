@@ -19,6 +19,7 @@
                 if(empty($errores)) {
                     //Guardo en la BD
                     $vendedor->guardar();
+                    header("Location: /admin");
                 }
             }
 

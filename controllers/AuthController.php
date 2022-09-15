@@ -19,19 +19,21 @@ use Classes\EmailUsuario;
 
                 if(empty($errores)) {
                     //Verificar si el usuario existe
-                    $resultado = $auth->existeUsuario("logearse");
-
+                    $usuario = $auth->existeUsuario("logearse");
+                    
                     //Si el usuario no existe
-                    if(!$resultado) {
+                    if(!$usuario || $usuario->confirmado == 0) {
+                        
                         $errores = Admin::getErrores();
                     } else {
                         //Si existe, verificar la contraseña
-                        $autenticado = $auth->comprobarPassword($resultado);
+                        $autenticado = $auth->comprobarPassword($usuario);
                         if(!$autenticado) {
                             $errores = Admin::getErrores();
                         } else {
                             //Autenticar al usuario
                             $auth->autenticar();
+                            header("Location: /admin");
                         }
                     }
                 }
@@ -131,15 +133,17 @@ use Classes\EmailUsuario;
                 header("Location: /");
             }
 
-            //Instancio admin para poder ejecutar sus funciones
-            $usuario = new Admin();
-
             //verifico que algun usuario tenga ese token de msj
-            $resultado = $usuario->existeTokenUsuario($url, $token);
-            if($resultado) {
-                $usuario = new Admin($resultado);
-                debugear($usuario);
+            $usuario = Admin::existeTokenUsuario($url, $token);
+            if($usuario) {
+                $usuario->confirmado = 1;
+                $usuario->token_msj = "";
+                $usuario->token_confirmar = "";
                 $usuario->guardar();
+                
+                
+            } else {
+                header("Location: /");
             }
 
             $router->render("auth/confirmar", [

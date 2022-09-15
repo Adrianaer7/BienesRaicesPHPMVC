@@ -71,45 +71,40 @@
         //revisar si el usuario existe
         public function existeUsuario($accion) {
             $query = "SELECT * FROM " . self::$tabla . " WHERE email = '$this->email'" . " LIMIT 1";
-            $resultado = self::$db->query($query); 
+            $resultado = self::consultarSQL($query); 
+            $usuario = (array_shift($resultado));
+            
             if($accion === "logearse") {
-                if(!$resultado->num_rows) {
-                    self::$errores[] = "El usuario no existe";
-                    return;
+                if(!$usuario || $usuario->confirmado == 0) {
+                    self::$errores[] = "El usuario no existe o su cuenta no ha sido verificada";
+                    return $usuario;
                 }
-                return $resultado;
+                return $usuario;
             } else {
-                if($resultado->num_rows) {
+                if($usuario) {
                     self::$errores[] = "El usuario ya existe";
-                    return $resultado;
+                    return $usuario;
                 }
             }
         }
 
-        public function existeTokenUsuario($url, $token) {
+        public static function existeTokenUsuario($url, $token) {
             $query = "SELECT * FROM " . self::$tabla . " WHERE $token = '$url'" . " LIMIT 1";
             $resultado = self::consultarSQL($query);
-            if($resultado) {
-                return array_shift( $resultado ) ;
-            } else {
-                header("Location: /");
-            }
+            return array_shift( $resultado );
         }
 
         public function hashPassword() : void {
             $this->password = password_hash($this->password, PASSWORD_BCRYPT);
-
         }
 
         public function crearToken() : void {
             $this->token_msj = md5(uniqid(rand(), true));
             $this->token_confirmar = md5(uniqid(rand(), true));
-
         }
 
         //si el usuario existe, compruebo password
-        public function comprobarPassword($resultado) {
-            $usuario = $resultado->fetch_object();  //fetch_object() trae los datos del usuario
+        public function comprobarPassword($usuario) {
             $autenticado = password_verify($this->password, $usuario->password);    //password_verify() comprueba que la contraseña del input que ingreso coincida con el hash de la bd
             if(!$autenticado) {
                 self::$errores[] = "Contraseña incorrecta";
@@ -122,8 +117,6 @@
             //Llenar el arreglo de session
             $_SESSION["usuario"] = $this->email;
             $_SESSION["login"] = true;
-            
-            header("Location: /admin");
         }
     }
 ?>
