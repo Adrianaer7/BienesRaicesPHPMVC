@@ -13,7 +13,7 @@
     //Instancio la clase
     $router = new Router();
 
-    //Defino las rutas - Zona privada
+    //Defino las rutas - ZONA PRIVADA
     //Propiedades
     $router->get("/admin", [PropiedadController::class, "index"]);  //PropiedadController::class indica en que controlador se va a encontra la funcion que le paso a la derecha para que el router pueda ejecutarla
     $router->get("/propiedades/crear", [PropiedadController::class, "crear"]);
@@ -28,7 +28,7 @@
     $router->post("/vendedores/actualizar", [VendedorController::class, "actualizar"]);
     $router->post("/vendedores/eliminar", [VendedorController::class, "eliminar"]);
     
-    //Defino las rutas - Zona publica
+    //Defino las rutas - ZONA PUBLICA
     //Paginas
     $router->get("/", [PaginasController::class, "index"]);
     $router->get("/nosotros", [PaginasController::class, "nosotros"]);
@@ -38,14 +38,22 @@
     $router->get("/entrada", [PaginasController::class, "entrada"]);
     $router->get("/contacto", [PaginasController::class, "contacto"]);
     $router->post("/contacto", [PaginasController::class, "contacto"]);
+
     //Login y autenticacion
     $router->get("/login", [AuthController::class, "login"]);
     $router->post("/login", [AuthController::class, "login"]);
     $router->get("/logout", [AuthController::class, "logout"]);
     $router->get("/registro", [AuthController::class, "registro"]);
     $router->post("/registro", [AuthController::class, "registro"]);
-    $router->get("/mensaje/${url}", [AuthController::class, "mensaje"]);    //leo la url de msj con la url que obtube arriba
+    $router->get("/msj-creado/${url}", [AuthController::class, "mensajeCreado"]);    //leo la url de msj con la url que obtube arriba
     $router->get("/confirmar-cuenta/${url}", [AuthController::class, 'confirmar']);
+    $router->get('/olvide', [AuthController::class, 'olvide']);
+    $router->post('/olvide', [AuthController::class, 'olvide']);
+    $router->get("/msj-cambiar/${url}", [AuthController::class, "mensajeCambiar"]); //formulario con email
+    $router->get("/reestablecer/${url}", [AuthController::class, 'reestablecer']);  //formulario para cambiar la contraseña
+    $router->post("/reestablecer/${url}", [AuthController::class, 'reestablecer']);
+    $router->get("/msj-cambiada/${url}", [AuthController::class, 'cambiada']);
+
 
      
     //Ejecutar las funciones asociadas a esas rutas

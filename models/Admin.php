@@ -80,11 +80,19 @@
                     return $usuario;
                 }
                 return $usuario;
-            } else {
+            } 
+            if($accion === "registrarse") {
                 if($usuario) {
                     self::$errores[] = "El usuario ya existe";
                     return $usuario;
                 }
+            }
+            if($accion === "cambiarPassword") {
+                if(!$usuario || $usuario->confirmado == 0) {
+                    self::$errores[] = "El usuario no existe o su cuenta no ha sido verificada";
+                    return $usuario;
+                }
+                return $usuario;
             }
         }
 
@@ -117,6 +125,27 @@
             //Llenar el arreglo de session
             $_SESSION["usuario"] = $this->email;
             $_SESSION["login"] = true;
+        }
+
+        // Valida un email
+        public function validarEmail() {
+            if(!$this->email) {
+                self::$errores[] = 'El Email es Obligatorio';
+            }
+            if(!filter_var($this->email, FILTER_VALIDATE_EMAIL)) {
+                self::$errores[] = 'Email no válido';
+            }
+            return self::$errores;
+        }
+
+        public function validarPassword() {
+            if(!$this->password) {
+                self::$errores[] = 'El Password no puede ir vacio';
+            }
+            if(strlen($this->password) < 6) {
+                self::$errores[] = 'El password debe contener al menos 6 caracteres';
+            }
+            return self::$errores;
         }
     }
 ?>

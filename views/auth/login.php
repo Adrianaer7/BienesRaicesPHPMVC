@@ -32,5 +32,6 @@
             >
         </form>
         <p class="informacion-meta">O si no tienes una cuenta, <a href="/registro"><span>REGISTRATE</span></a></p>
+        <p class="informacion-meta"><a href="/olvide">¿Olvidaste tu contraseña?</p>
         
     </main>

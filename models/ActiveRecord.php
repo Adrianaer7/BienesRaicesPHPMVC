@@ -82,7 +82,8 @@
         //GUARDAR LOS DATOS EN LA BD
         public function guardar() {
             if((!is_null($this->id))) {  //Actualizar
-                $this->actualizar();
+                $resultado = $this->actualizar();
+                return $resultado;
             } else {    //Crear nuevo
                 $resultado = $this->crear();
                 return $resultado;
