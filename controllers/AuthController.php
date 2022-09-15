@@ -6,6 +6,8 @@
 use Classes\EmailUsuario;
 
     class AuthController {
+
+        //Logearse
         public static function login(Router $router) {
             $errores = [];
             $pagina = "Login";
@@ -23,7 +25,6 @@ use Classes\EmailUsuario;
                     
                     //Si el usuario no existe
                     if(!$usuario || $usuario->confirmado == 0) {
-                        
                         $errores = Admin::getErrores();
                     } else {
                         //Si existe, verificar la contraseña
@@ -44,7 +45,7 @@ use Classes\EmailUsuario;
             ]);
         }
 
-
+        //Deslogearse
         public static function logout() {
             session_start();
             $_SESSION = [];
@@ -52,7 +53,7 @@ use Classes\EmailUsuario;
             header("Location: /");
         }
 
-
+        //Registrarse
         public static function registro(Router $router) {
             $pagina = "Registro";
             $errores = [];
@@ -76,8 +77,10 @@ use Classes\EmailUsuario;
                         //hasheo la contraseña
                         $usuario->hashPassword();
 
-                        //creo un token
+                        //creo un token para la url al enviar el formulario y otro que se envia por email
                         $usuario->crearToken();
+
+                        //Creo una url para el mensaje
                         $urlMensaje = $usuario->token_msj;
                         
                         //Guardo el usuario nuevo en la BD
@@ -87,6 +90,7 @@ use Classes\EmailUsuario;
                         $email = new EmailUsuario($usuario->email, $usuario->nombre, $usuario->token_confirmar);
                         $email->enviarConfirmacion();
 
+                        //Redirijo al usuario a una url creada con el token generado
                         if($resultado) {
                             header("Location: /msj-creado/$urlMensaje");
                         }
@@ -100,12 +104,13 @@ use Classes\EmailUsuario;
             ]);
         }
 
-       public static function mensajeCreado(Router $router) {
+        //Mensaje al crear usuario
+        public static function mensajeCreado(Router $router) {
            $pagina = "Mensaje";
            $token = "token_msj";
            $mensaje = "Usuario creado correctamente. Revise su email.";
 
-           //separo la url en arrays segun sus /, y accedo a la posicion 2
+           //separo la url en arrays segun sus /, y accedo a la posicion 2. Si despues de la url "msj-creado" no viene un token, redirijo
            $url = s($_SERVER["PATH_INFO"]);
            $url = explode('/',$url)[2];
            if(!$url) {
@@ -126,6 +131,80 @@ use Classes\EmailUsuario;
             ]);
         }
 
+        //Confirmo el usuario 
+        public static function confirmar(Router $router) {
+            $pagina = "Confirmacion de cuenta";
+            $token = "token_confirmar";
+            $mensaje = "Su cuenta ha sido confirmada. Puede iniciar sesion";
+
+            //separo la url en arrays segun sus /, y accedo a la posicion 2
+            $url = s($_SERVER["PATH_INFO"]);
+            $url = explode('/',$url)[2]; 
+            if(!$url) {
+                header("Location: /");
+            }
+
+            //verifico que algun usuario tenga ese token de msj
+            $usuario = Admin::existeTokenUsuario($url, $token);
+
+            //confirmo el usuario vaciando los tokens
+            if($usuario) {
+                $usuario->confirmado = 1;
+                $usuario->token_msj = "";
+                $usuario->token_confirmar = "";
+                $usuario->guardar();
+            } else {
+                header("Location: /");
+            }
+
+            $router->render("auth/mensaje", [
+            "pagina" => $pagina,
+            "mensaje" => $mensaje
+            ]);
+        }
+
+        //formulario con email para reestablecer contraseña
+        public static function olvide(Router $router) {
+            $pagina = "Olvidé mi contraseña";
+            $errores = [];
+            $usuario = new Admin();
+
+            if($_SERVER["REQUEST_METHOD"] === "POST") {
+                //envio el email a la memoria
+                $usuario = new Admin($_POST);
+
+                //valido que el campo email que envié por el form tenga formato adecuado y no esté vacio
+                $errores = $usuario->validarEmail();
+
+                if(!empty($errores)) {
+                    $errores = Admin::getErrores();
+                } else {
+                    //compruebo que el usuario que quiere cambiar la contraseña exista y esté verificado
+                    $usuario = $usuario->existeUsuario("cambiarPassword");
+
+                    if($usuario) {
+                        $usuario->crearToken();
+                        $urlMensaje = $usuario->token_msj;
+                        $resultado = $usuario->guardar();
+
+                        $email = new EmailUsuario($usuario->email, $usuario->nombre, $usuario->token_confirmar);
+                        $email->enviarInstrucciones();
+
+                        if($resultado) {
+                            header("Location: /msj-cambiar/$urlMensaje");
+                        }
+                    } 
+                }
+            }
+
+    $router->render("auth/olvide", [
+        "pagina" => $pagina,
+        "errores" => $errores,
+        "usuario" => $usuario
+    ]);
+}
+
+        //Mensaje de pasos a seguir para cambiar la contraseña
         public static function mensajeCambiar(Router $router) {
             $pagina = "Mensaje";
             $token = "token_msj";
@@ -152,76 +231,12 @@ use Classes\EmailUsuario;
             ]);
          }
 
-        public static function confirmar(Router $router) {
-            $pagina = "Confirmacion de cuenta";
-            $token = "token_confirmar";
-            $mensaje = "Su cuenta ha sido confirmada. Puede iniciar sesion";
-
-            //separo la url en arrays segun sus /, y accedo a la posicion 2
-            $url = s($_SERVER["PATH_INFO"]);
-            $url = explode('/',$url)[2]; 
-            if(!$url) {
-                header("Location: /");
-            }
-
-            //verifico que algun usuario tenga ese token de msj
-            $usuario = Admin::existeTokenUsuario($url, $token);
-            if($usuario) {
-                $usuario->confirmado = 1;
-                $usuario->token_msj = "";
-                $usuario->token_confirmar = "";
-                $usuario->guardar();
-                
-                
-            } else {
-                header("Location: /");
-            }
-
-            $router->render("auth/mensaje", [
-            "pagina" => $pagina,
-            "mensaje" => $mensaje
-            ]);
-        }
-
-        public static function olvide(Router $router) {
-            $pagina = "Olvidé mi contraseña";
-            $errores = [];
-            $usuario = new Admin();
-
-            if($_SERVER["REQUEST_METHOD"] === "POST") {
-                $usuario = new Admin($_POST);
-                $errores = $usuario->validarEmail();
-                if(!empty($errores)) {
-                    $errores = Admin::getErrores();
-                } else {
-                    $usuario = $usuario->existeUsuario("cambiarPassword");
-                    if($usuario) {
-                        $usuario->crearToken();
-                        $urlMensaje = $usuario->token_msj;
-                        $resultado = $usuario->guardar();
-
-                        $email = new EmailUsuario($usuario->email, $usuario->nombre, $usuario->token_confirmar);
-                        $email->enviarInstrucciones();
-
-                        if($resultado) {
-                            header("Location: /msj-cambiar/$urlMensaje");
-                        }
-                    } 
-                }
-            }
-
-            $router->render("auth/olvide", [
-                "pagina" => $pagina,
-                "errores" => $errores,
-                "usuario" => $usuario
-            ]);
-        }
 
         public static function reestablecer(Router $router) {
             $pagina = "Reestablecer contraseña";
             $token = "token_confirmar";
             $errores = [];
-            $urlPost = $_ENV['HOST'] . $_SERVER["PATH_INFO"];
+            $urlPost = $_ENV['HOST'] . $_SERVER["PATH_INFO"];   //creo esta variable ya que el form de donde envio los datos tiene una url dinamica
             $usuario = new Admin();
 
             $url = s($_SERVER["PATH_INFO"]);
@@ -230,15 +245,21 @@ use Classes\EmailUsuario;
                 header("Location: /");
             }
             
+            //verifico que el usuario al que quiero cambiar la contraseña exista
             $usuario = Admin::existeTokenUsuario($url, $token);
             if(!$usuario) {
                 header("Location: /");
             }
+
+            //vacio el campo password para que el formulario no se llene automaticamente con lo que viene de la bd
             $usuario->password = "";
             
             if($_SERVER["REQUEST_METHOD"] === "POST") {
+                //guardo en memoria el usuario traido de la bd mas la contraseña recien creada
                 $usuario->sincronizar($_POST);
+                //valido que la contraseña nueva cumpla con los requisitos
                 $errores = $usuario->validarPassword();
+
                 if(empty($errores)) {
                     $usuario->hashPassword();
                     $urlMensaje = $usuario->token_msj;
@@ -272,6 +293,7 @@ use Classes\EmailUsuario;
             if(!$url) {
                 header("Location: /");
             }
+            //verifico que el usuario que cambió la contraseña exista
             $usuario = Admin::existeTokenUsuario($url, $token);
             if($usuario) {
                 $usuario->token_msj = "";
