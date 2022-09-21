@@ -37,8 +37,6 @@
                     id="password"
                     autocomplete="off"
                     name="password"
-                    value="<?php echo s($usuario->password) ?>"
-
                 >
                 <label for="confirmar">Repetir contraseña</label>
                 <input 
@@ -47,8 +45,6 @@
                     id="confirmar"
                     autocomplete="off"
                     name="confirmar_password"
-                    value="<?php echo s($usuario->confirmar_password) ?>"
-
                 >
             </fieldset>   
             <input 
