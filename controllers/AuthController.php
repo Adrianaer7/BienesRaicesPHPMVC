@@ -79,9 +79,6 @@ use Classes\EmailUsuario;
 
                         //creo un token para la url al enviar el formulario y otro que se envia por email
                         $usuario->crearToken();
-
-                        //Creo una url para el mensaje
-                        $urlMensaje = $usuario->token_msj;
                         
                         //Guardo el usuario nuevo en la BD
                         $resultado = $usuario->guardar();
@@ -92,7 +89,7 @@ use Classes\EmailUsuario;
 
                         //Redirijo al usuario a una url creada con el token generado
                         if($resultado) {
-                            header("Location: /msj-creado/$urlMensaje");
+                            header("Location: /msj-creado?id=" . urldecode($usuario->token_msj));   //urlencode evita caracteres especiales
                         }
                     }
                 }
@@ -110,9 +107,8 @@ use Classes\EmailUsuario;
            $token = "token_msj";
            $mensaje = "Usuario creado correctamente. Revise su email.";
 
-           //separo la url en arrays segun sus /, y accedo a la posicion 2. Si despues de la url "msj-creado" no viene un token, redirijo
-           $url = s($_SERVER["PATH_INFO"]);
-           $url = explode('/',$url)[2];
+           //Valido que haya token
+           $url = $_GET["id"];
            if(!$url) {
               header("Location: /");
            }
@@ -137,9 +133,8 @@ use Classes\EmailUsuario;
             $token = "token_confirmar";
             $mensaje = "Su cuenta ha sido confirmada. Puede iniciar sesion";
 
-            //separo la url en arrays segun sus /, y accedo a la posicion 2
-            $url = s($_SERVER["PATH_INFO"]);
-            $url = explode('/',$url)[2]; 
+            //Valido que haya token
+            $url = $_GET["id"];
             if(!$url) {
                 header("Location: /");
             }
@@ -184,24 +179,23 @@ use Classes\EmailUsuario;
 
                     if($usuario) {
                         $usuario->crearToken();
-                        $urlMensaje = $usuario->token_msj;
                         $resultado = $usuario->guardar();
 
                         $email = new EmailUsuario($usuario->email, $usuario->nombre, $usuario->token_confirmar);
                         $email->enviarInstrucciones();
 
                         if($resultado) {
-                            header("Location: /msj-cambiar/$urlMensaje");
+                            header("Location: /msj-cambiar?id=" . urlencode($usuario->token_msj));
                         }
                     } 
                 }
             }
 
-    $router->render("auth/olvide", [
-        "pagina" => $pagina,
-        "errores" => $errores,
-        "usuario" => $usuario
-    ]);
+            $router->render("auth/olvide", [
+                "pagina" => $pagina,
+                "errores" => $errores,
+                "usuario" => $usuario
+            ]);
 }
 
         //Mensaje de pasos a seguir para cambiar la contraseña
@@ -210,9 +204,8 @@ use Classes\EmailUsuario;
             $token = "token_msj";
             $mensaje = "Revise su email para seguir los pasos.";
  
-            //separo la url en arrays segun sus /, y accedo a la posicion 2
-            $url = s($_SERVER["PATH_INFO"]);
-            $url = explode('/',$url)[2];
+            //Valido que haya token
+            $url = $_GET["id"];
             if(!$url) {
                header("Location: /");
             }
@@ -239,8 +232,7 @@ use Classes\EmailUsuario;
             $urlPost = $_ENV['HOST'] . $_SERVER["PATH_INFO"];   //creo esta variable ya que el form de donde envio los datos tiene una url dinamica
             $usuario = new Admin();
 
-            $url = s($_SERVER["PATH_INFO"]);
-            $url = explode('/',$url)[2]; 
+            $url = $_GET["id"];
             if(!$url) {
                 header("Location: /");
             }
@@ -262,11 +254,10 @@ use Classes\EmailUsuario;
 
                 if(empty($errores)) {
                     $usuario->hashPassword();
-                    $urlMensaje = $usuario->token_msj;
                     $resultado = $usuario->guardar();
 
                     if($resultado) {
-                        header("Location: /msj-cambiada/$urlMensaje");
+                        header("Location: /msj-cambiada?id=" . urldecode($usuario->token_msj));
                     }
                 } else {
                     $errores = Admin::getErrores();
@@ -288,13 +279,14 @@ use Classes\EmailUsuario;
             $token = "token_msj";
             $usuario = new Admin();
 
-            $url = s($_SERVER["PATH_INFO"]);
-            $url = explode('/',$url)[2]; 
+            $url = $_GET["id"]; 
             if(!$url) {
                 header("Location: /");
             }
+
             //verifico que el usuario que cambió la contraseña exista
             $usuario = Admin::existeTokenUsuario($url, $token);
+            
             if($usuario) {
                 $usuario->token_msj = "";
                 $usuario->token_confirmar = "";

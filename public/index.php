@@ -7,9 +7,6 @@
     use Controllers\VendedorController;
     use Controllers\PaginasController;
 
-    $url = $_SERVER["PATH_INFO"];
-    $url = explode('/',$url)[2];  //separo la url en arrays segun sus /, y accedo a la posicion 2
-
     //Instancio la clase
     $router = new Router();
 
@@ -45,14 +42,14 @@
     $router->get("/logout", [AuthController::class, "logout"]);
     $router->get("/registro", [AuthController::class, "registro"]);
     $router->post("/registro", [AuthController::class, "registro"]);
-    $router->get("/msj-creado/${url}", [AuthController::class, "mensajeCreado"]);    //leo la url de msj con la url que obtube arriba
-    $router->get("/confirmar-cuenta/${url}", [AuthController::class, 'confirmar']);
+    $router->get("/msj-creado", [AuthController::class, "mensajeCreado"]);    //leo la url de msj con la url que obtube arriba
+    $router->get("/confirmar-cuenta", [AuthController::class, 'confirmar']);
     $router->get('/olvide', [AuthController::class, 'olvide']);
     $router->post('/olvide', [AuthController::class, 'olvide']);
-    $router->get("/msj-cambiar/${url}", [AuthController::class, "mensajeCambiar"]); //formulario con email
-    $router->get("/reestablecer/${url}", [AuthController::class, 'reestablecer']);  //formulario para cambiar la contraseña
-    $router->post("/reestablecer/${url}", [AuthController::class, 'reestablecer']);
-    $router->get("/msj-cambiada/${url}", [AuthController::class, 'cambiada']);
+    $router->get("/msj-cambiar", [AuthController::class, "mensajeCambiar"]); //formulario con email
+    $router->get("/reestablecer", [AuthController::class, 'reestablecer']);  //formulario para cambiar la contraseña
+    $router->post("/reestablecer", [AuthController::class, 'reestablecer']);
+    $router->get("/msj-cambiada", [AuthController::class, 'cambiada']);
 
 
      

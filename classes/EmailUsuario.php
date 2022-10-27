@@ -37,7 +37,7 @@
 
             $contenido = '<html>';
             $contenido .= "<p><strong>Hola " . $this->nombre .  "</strong> Has Registrado Correctamente tu cuenta en DevWebCamp; pero es necesario confirmarla</p>";
-            $contenido .= "<p>Presiona aquí: <a href='" . $_ENV['HOST'] . "/confirmar-cuenta/$this->token_confirmar" . "'>Confirmar Cuenta</a>";       
+            $contenido .= "<p>Presiona aquí: <a href='" . $_ENV['HOST'] . "/confirmar-cuenta?id=" . urldecode($this->token_confirmar) ."'>Confirmar Cuenta</a>";       
             $contenido .= "<p>Si tu no creaste esta cuenta; puedes ignorar el mensaje</p>";
             $contenido .= '</html>';
             $mail->Body = $contenido;
@@ -67,7 +67,7 @@
     
             $contenido = '<html>';
             $contenido .= "<p><strong>Hola " . $this->nombre .  "</strong> Has solicitado reestablecer tu password, sigue el siguiente enlace para hacerlo.</p>";
-            $contenido .= "<p>Presiona aquí: <a href='" . $_ENV['HOST'] . "/reestablecer/$this->token_confirmar" . "'>Reestablecer Password</a>";        
+            $contenido .= "<p>Presiona aquí: <a href='" . $_ENV['HOST'] . "/reestablecer?id=" . urlencode($this->token_confirmar) ."'>Reestablecer Password</a>";        
             $contenido .= "<p>Si tu no solicitaste este cambio, puedes ignorar el mensaje</p>";
             $contenido .= '</html>';
             $mail->Body = $contenido;
